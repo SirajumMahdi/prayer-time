@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prayer Times</title>
+    <meta name="description" content="Minimalist prayer times with Quranic inspiration">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Anek+Bangla:wght@100..800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="dist/styles.css">
+</head>
+<body class="bg-[#faf8f5] min-h-screen text-[#2d3436] font-serif antialiased">
+
+    <!-- Subtle Islamic Pattern Background -->
+    <div class="fixed inset-0 pointer-events-none opacity-[0.015] bg-pattern-container">
+        <svg class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <pattern id="islamic-pattern" x="0" y="0" width="120" height="120" patternUnits="userSpaceOnUse">
+                    <path d="M60 20 L65 45 L90 40 L70 60 L90 80 L65 75 L60 100 L55 75 L30 80 L50 60 L30 40 L55 45 Z"
+                          fill="none" stroke="#1e5f3d" stroke-width="0.5"/>
+                    <circle cx="60" cy="60" r="35" fill="none" stroke="#1e5f3d" stroke-width="0.3"/>
+                </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#islamic-pattern)"/>
+        </svg>
+    </div>
+
+    <!-- Sticky Header -->
+    <header class="sticky top-0 z-50 bg-[#faf8f5]/95 backdrop-blur-sm border-b border-[#e8e6e1] fade-in">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <h1 class="text-2xl font-medium text-[#1e5f3d] tracking-tight" data-i18n="appTitle">Prayer Times</h1>
+                </div>
+
+                <!-- Current Prayer Quick View -->
+                <div id="headerPrayerInfo" class="hidden min-[400px]:flex opacity-0 transition-opacity duration-300 items-center gap-6">
+                    <div class="text-right">
+                        <div class="text-xs uppercase tracking-widest text-[#636e72]" data-i18n="now">Now</div>
+                        <div id="headerPrayerName" class="text-base font-medium text-[#1e5f3d]">—</div>
+                    </div>
+                    <div class="h-8 w-px bg-[#e8e6e1]"></div>
+                    <div class="text-right">
+                        <div class="text-xs uppercase tracking-widest text-[#636e72]" data-i18n="remaining">Remaining</div>
+                        <div id="headerCountdown" class="text-base font-mono text-[#2d3436]">--:--:--</div>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-1">
+                    <button id="settingsBtn" class="p-2 rounded-lg hover:bg-[#1e5f3d]/5 transition-colors text-xs font-medium text-[#636e72]" aria-label="Settings">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                    </button>
+                    <button id="langToggle" class="p-2 rounded-lg hover:bg-[#1e5f3d]/5 transition-colors text-xs font-medium text-[#636e72]" aria-label="Toggle language">
+                        EN
+                    </button>
+                    <button id="themeToggle" class="p-2 rounded-full hover:bg-[#1e5f3d]/5 transition-colors" aria-label="Toggle theme">
+                        <svg class="w-4 h-4 sun-icon text-[#636e72]" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"/>
+                        </svg>
+                        <svg class="w-4 h-4 moon-icon text-[#636e72] hidden" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-6 lg:py-8">
+
+
+
+        <!-- Split Screen Layout -->
+        <div class="grid lg:grid-cols-2 gap-6 mb-6">
+
+            <!-- LEFT: Current Prayer Focus -->
+            <div class="space-y-4 fade-in-delay-2">
+
+                <!-- Current Prayer Card -->
+                <div id="currentPrayerCard" class="p-6 bg-[#1e5f3d] text-white rounded-xl shadow-lg relative overflow-hidden">
+                    <div class="flex items-start justify-between mb-4 relative z-10">
+                        <div>
+                            <h2 id="currentPrayerName" class="text-4xl font-medium">—</h2>
+                            <p class="text-sm text-white/70 mb-2" id="currentPrayerTime">—</p>
+                        </div>
+                        <div class="text-right">
+                            <p id="gregorianDate" class="text-sm text-white/90 font-medium tracking-wide">Loading...</p>
+                            <p id="hijriDate" class="text-xs text-white/70 font-arabic mt-0.5 tracking-wide">—</p>
+                            <!-- Location in Card (New) -->
+                            <div class="flex items-center justify-end gap-1.5 text-xs text-white/60">
+                                <svg class="w-3 h-3 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                </svg>
+                                <span id="cardLocation">Dhaka, BD</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Semi-Circle Progress Bar -->
+                    <div class="relative w-full aspect-[2/1] mt-2 flex items-end justify-center">
+                        <svg class="w-full h-full absolute top-0 left-0" viewBox="0 0 200 100" preserveAspectRatio="none">
+                            <!-- Background Arc -->
+                            <path d="M 20 100 A 80 80 0 0 1 180 100" 
+                                  fill="none" 
+                                  stroke="rgba(255,255,255,0.1)" 
+                                  stroke-width="12" 
+                                  stroke-linecap="round"/>
+                            <!-- Progress Arc -->
+                            <path id="currentPrayerProgress" 
+                                  d="M 20 100 A 80 80 0 0 1 180 100" 
+                                  fill="none" 
+                                  stroke="#4ade80" 
+                                  stroke-width="12" 
+                                  stroke-linecap="round"
+                                  stroke-dasharray="251.2"
+                                  stroke-dashoffset="251.2"
+                                  class="transition-all duration-1000 ease-linear"/>
+                        </svg>
+                        
+                        <!-- Centered Timer -->
+                        <div class="relative z-10 text-center mb-2">
+                            <p class="text-xs uppercase tracking-wider text-white/50 mb-0.5" data-i18n="timeRemaining">Time Remaining</p>
+                            <p id="currentPrayerCountdown" class="text-4xl font-mono font-medium tracking-tight">--:--:--</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ramadan Times -->
+                <div id="ramadanSection" class="grid grid-cols-2 gap-3">
+                    <div class="p-4 bg-white rounded-lg border border-[#e8e6e1] text-center">
+                        <p class="text-xs uppercase tracking-widest text-[#636e72] mb-1" data-i18n="sehriEnds">Sehri Ends</p>
+                        <p id="sehriTime" class="text-2xl font-mono text-[#1e5f3d]">--:--</p>
+                    </div>
+                    <div class="p-4 bg-white rounded-lg border border-[#e8e6e1] text-center">
+                        <p class="text-xs uppercase tracking-widest text-[#636e72] mb-1" data-i18n="iftar">Iftar</p>
+                        <p id="iftarTime" class="text-2xl font-mono text-[#1e5f3d]">--:--</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT: Visual Timeline -->
+            <div class="fade-in-delay-3">
+                <div class="bg-white rounded-xl border border-[#e8e6e1] p-5 shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-sm uppercase tracking-widest text-[#636e72]" data-i18n="todaysSchedule">Today's Schedule</h3>
+                        <div class="flex items-center gap-1">
+                            <button id="statsBtn" class="p-1.5 text-[#636e72] hover:text-[#1e5f3d] bg-white hover:bg-[#1e5f3d]/5 rounded-lg transition-colors" title="Prayer Stats">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                                </svg>
+                            </button>
+                            <button id="calendarBtn" class="p-1.5 text-[#636e72] hover:text-[#1e5f3d] bg-white hover:bg-[#1e5f3d]/5 rounded-lg transition-colors" title="Monthly Calendar">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                            </button>
+                            <button id="notificationSettingsBtn" class="p-1.5 text-[#636e72] hover:text-[#1e5f3d] bg-white hover:bg-[#1e5f3d]/5 rounded-lg transition-colors" title="Notification Settings">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Timeline -->
+                    <div class="space-y-1">
+                        <!-- Fajr -->
+                        <div id="fajr" class="prayer-row timeline-item">
+                            <div class="flex items-center gap-3 py-3">
+                                <div class="timeline-dot"></div>
+                                <div class="w-8 h-8 rounded-full bg-[#fef8f0] flex items-center justify-center flex-shrink-0">
+                                    <span class="text-base opacity-70">🌅</span>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-baseline justify-between gap-2">
+                                        <span class="font-medium text-[#2d3436] text-base" data-i18n="fajr">Fajr</span>
+                                        <span class="prayer-start font-mono text-sm text-[#636e72]">--:--</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 mt-0.5">
+                                        <div class="flex-1 h-1 bg-[#f5f5f5] rounded-full overflow-hidden">
+                                            <div class="prayer-progress h-full bg-[#1e5f3d] rounded-full transition-all duration-1000"></div>
+                                        </div>
+                                        <span class="prayer-end font-mono text-[10px] text-[#b2bec3]">--:--</span>
+                                    </div>
+                                </div>
+                                <span class="prayer-status"></span>
+                                <button class="prayer-track-btn w-6 h-6 rounded-full border-2 border-[#e8e6e1] hover:border-[#1e5f3d] flex items-center justify-center transition-all" data-prayer="Fajr" aria-label="Mark Fajr as completed">
+                                    <svg class="w-3.5 h-3.5 text-white opacity-0 transition-opacity" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Dhuhr -->
+                        <div id="dhuhr" class="prayer-row timeline-item">
+                            <div class="flex items-center gap-3 py-3">
+                                <div class="timeline-dot"></div>
+                                <div class="w-8 h-8 rounded-full bg-[#fffbf0] flex items-center justify-center flex-shrink-0">
+                                    <span class="text-base opacity-70">☀️</span>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-baseline justify-between gap-2">
+                                        <span class="font-medium text-[#2d3436] text-base" data-i18n="dhuhr">Dhuhr</span>
+                                        <span class="prayer-start font-mono text-sm text-[#636e72]">--:--</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 mt-0.5">
+                                        <div class="flex-1 h-1 bg-[#f5f5f5] rounded-full overflow-hidden">
+                                            <div class="prayer-progress h-full bg-[#1e5f3d] rounded-full transition-all duration-1000"></div>
+                                        </div>
+                                        <span class="prayer-end font-mono text-[10px] text-[#b2bec3]">--:--</span>
+                                    </div>
+                                </div>
+                                <span class="prayer-status"></span>
+                                <button class="prayer-track-btn w-6 h-6 rounded-full border-2 border-[#e8e6e1] hover:border-[#1e5f3d] flex items-center justify-center transition-all" data-prayer="Dhuhr" aria-label="Mark Dhuhr as completed">
+                                    <svg class="w-3.5 h-3.5 text-white opacity-0 transition-opacity" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Asr -->
+                        <div id="asr" class="prayer-row timeline-item">
+                            <div class="flex items-center gap-3 py-3">
+                                <div class="timeline-dot"></div>
+                                <div class="w-8 h-8 rounded-full bg-[#fff5f0] flex items-center justify-center flex-shrink-0">
+                                    <span class="text-base opacity-70">🌤️</span>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-baseline justify-between gap-2">
+                                        <span class="font-medium text-[#2d3436] text-base" data-i18n="asr">Asr</span>
+                                        <span class="prayer-start font-mono text-sm text-[#636e72]">--:--</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 mt-0.5">
+                                        <div class="flex-1 h-1 bg-[#f5f5f5] rounded-full overflow-hidden">
+                                            <div class="prayer-progress h-full bg-[#1e5f3d] rounded-full transition-all duration-1000"></div>
+                                        </div>
+                                        <span class="prayer-end font-mono text-[10px] text-[#b2bec3]">--:--</span>
+                                    </div>
+                                </div>
+                                <span class="prayer-status"></span>
+                                <button class="prayer-track-btn w-6 h-6 rounded-full border-2 border-[#e8e6e1] hover:border-[#1e5f3d] flex items-center justify-center transition-all" data-prayer="Asr" aria-label="Mark Asr as completed">
+                                    <svg class="w-3.5 h-3.5 text-white opacity-0 transition-opacity" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Maghrib -->
+                        <div id="maghrib" class="prayer-row timeline-item">
+                            <div class="flex items-center gap-3 py-3">
+                                <div class="timeline-dot"></div>
+                                <div class="w-8 h-8 rounded-full bg-[#fff0f3] flex items-center justify-center flex-shrink-0">
+                                    <span class="text-base opacity-70">🌅</span>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-baseline justify-between gap-2">
+                                        <span class="font-medium text-[#2d3436] text-base" data-i18n="maghrib">Maghrib</span>
+                                        <span class="prayer-start font-mono text-sm text-[#636e72]">--:--</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 mt-0.5">
+                                        <div class="flex-1 h-1 bg-[#f5f5f5] rounded-full overflow-hidden">
+                                            <div class="prayer-progress h-full bg-[#1e5f3d] rounded-full transition-all duration-1000"></div>
+                                        </div>
+                                        <span class="prayer-end font-mono text-[10px] text-[#b2bec3]">--:--</span>
+                                    </div>
+                                </div>
+                                <span class="prayer-status"></span>
+                                <button class="prayer-track-btn w-6 h-6 rounded-full border-2 border-[#e8e6e1] hover:border-[#1e5f3d] flex items-center justify-center transition-all" data-prayer="Maghrib" aria-label="Mark Maghrib as completed">
+                                    <svg class="w-3.5 h-3.5 text-white opacity-0 transition-opacity" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Isha -->
+                        <div id="isha" class="prayer-row timeline-item">
+                            <div class="flex items-center gap-3 py-3">
+                                <div class="timeline-dot"></div>
+                                <div class="w-8 h-8 rounded-full bg-[#f5f3ff] flex items-center justify-center flex-shrink-0">
+                                    <span class="text-base opacity-70">🌙</span>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-baseline justify-between gap-2">
+                                        <span class="font-medium text-[#2d3436] text-base" data-i18n="isha">Isha</span>
+                                        <span class="prayer-start font-mono text-sm text-[#636e72]">--:--</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 mt-0.5">
+                                        <div class="flex-1 h-1 bg-[#f5f5f5] rounded-full overflow-hidden">
+                                            <div class="prayer-progress h-full bg-[#1e5f3d] rounded-full transition-all duration-1000"></div>
+                                        </div>
+                                        <span class="prayer-end font-mono text-[10px] text-[#b2bec3]">--:--</span>
+                                    </div>
+                                </div>
+                                <span class="prayer-status"></span>
+                                <button class="prayer-track-btn w-6 h-6 rounded-full border-2 border-[#e8e6e1] hover:border-[#1e5f3d] flex items-center justify-center transition-all" data-prayer="Isha" aria-label="Mark Isha as completed">
+                                    <svg class="w-3.5 h-3.5 text-white opacity-0 transition-opacity" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quran Ayah Section -->
+        <div class="max-w-3xl mx-auto mb-6 fade-in-delay-4">
+            <div class="p-6 bg-[#f0f7f4] rounded-xl border border-[#1e5f3d]/10">
+                <div id="ayahLoader" class="text-center py-6">
+                    <div class="inline-block w-6 h-6 border-2 border-[#1e5f3d]/20 border-t-[#1e5f3d] rounded-full animate-spin"></div>
+                </div>
+                <div id="ayahContent" class="hidden">
+                    <p id="arabicText" class="text-xl font-arabic text-right leading-loose text-[#1e5f3d] mb-4" dir="rtl"></p>
+                    <div class="w-12 h-px bg-[#1e5f3d]/20 mx-auto mb-4"></div>
+                    <p id="englishText" class="text-sm text-[#636e72] italic leading-relaxed mb-3"></p>
+                    <p id="ayahReference" class="text-xs text-[#1e5f3d] tracking-wide">—</p>
+                </div>
+                <button id="newAyahBtn" class="mt-4 w-full py-2.5 px-4 bg-white hover:bg-[#1e5f3d]/5 border border-[#1e5f3d]/10 hover:border-[#1e5f3d]/20 rounded-lg text-[#1e5f3d] text-xs transition-all tracking-wide">
+                    <span data-i18n="newVerse">New Verse</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Location Form -->
+        <div id="locationForm" class="hidden max-w-md mx-auto mb-6 p-5 bg-white rounded-xl border border-[#e8e6e1]">
+            <h3 class="text-xs uppercase tracking-widest text-[#636e72] mb-3" data-i18n="changeLocation">Change Location</h3>
+            <div class="flex gap-2 mb-3">
+                <input type="text" id="cityInput" placeholder="City"
+                       class="flex-1 px-3 py-2 text-sm bg-[#faf8f5] border border-[#e8e6e1] rounded-lg text-[#2d3436] placeholder-[#b2bec3] focus:outline-none focus:border-[#1e5f3d]/30 transition-colors">
+                <input type="text" id="countryInput" placeholder="Country"
+                       class="flex-1 px-3 py-2 text-sm bg-[#faf8f5] border border-[#e8e6e1] rounded-lg text-[#2d3436] placeholder-[#b2bec3] focus:outline-none focus:border-[#1e5f3d]/30 transition-colors">
+            </div>
+            <div class="flex gap-2">
+                <button id="saveLocationBtn" class="flex-1 py-2 text-sm bg-[#1e5f3d] hover:bg-[#265f41] text-white rounded-lg transition-colors" data-i18n="save">Save</button>
+                <button id="cancelLocationBtn" class="flex-1 py-2 text-sm bg-[#f5f5f5] hover:bg-[#e8e6e1] text-[#636e72] rounded-lg transition-colors" data-i18n="cancel">Cancel</button>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="text-center text-xs text-[#636e72] fade-in-delay-5">
+            <button id="changeLocationBtn" class="hover:text-[#1e5f3d] transition-colors tracking-wide">
+                <span data-i18n="changeLocation">Change Location</span>
+            </button>
+        </footer>
+    </div>
+
+    <!-- Notification Settings Modal -->
+    <div id="notificationSettings" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="hideNotificationSettings()"></div>
+        <div class="relative bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 border border-[#e8e6e1] max-h-[90vh] overflow-y-auto">
+            <button onclick="hideNotificationSettings()" class="absolute top-4 right-4 p-1 text-[#636e72] hover:text-[#2d3436] transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+            <h3 class="text-lg font-medium text-[#1e5f3d] mb-2" data-i18n="prayerNotifications">🔔 Prayer Notifications</h3>
+            <p class="text-sm text-[#636e72] mb-4" data-i18n="notificationDesc">Set your preferred notification time for each prayer.</p>
+            
+            <div class="space-y-3">
+                <div class="flex items-center justify-between p-3 bg-[#faf8f5] rounded-lg">
+                    <span class="text-sm text-[#2d3436]" data-i18n="enableNotifications">Enable Notifications</span>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="notificationEnabled" class="sr-only peer" checked>
+                        <div class="w-11 h-6 bg-[#e8e6e1] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#1e5f3d]"></div>
+                    </label>
+                </div>
+
+                <!-- All Prayers Settings -->
+                <div class="space-y-2">
+                    <!-- Fajr -->
+                    <div class="prayer-setting p-3 bg-[#faf8f5] rounded-lg">
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="flex items-center gap-2">
+                                <span class="text-lg">🌅</span>
+                                <span class="text-sm font-medium text-[#2d3436]" data-i18n="fajr">Fajr</span>
+                            </div>
+                            <span id="fajrWindow" class="text-xs text-[#636e72]">--:-- - --:--</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <input type="time" id="fajrStart" class="flex-1 px-2 py-1.5 text-sm bg-white border border-[#e8e6e1] rounded-lg text-[#2d3436] focus:outline-none focus:border-[#1e5f3d]/30">
+                            <span class="text-xs text-[#636e72]" data-i18n="to">to</span>
+                            <input type="time" id="fajrEnd" class="flex-1 px-2 py-1.5 text-sm bg-white border border-[#e8e6e1] rounded-lg text-[#2d3436] focus:outline-none focus:border-[#1e5f3d]/30">
+                        </div>
+                    </div>
+
+                    <!-- Dhuhr -->
+                    <div class="prayer-setting p-3 bg-[#faf8f5] rounded-lg">
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="flex items-center gap-2">
+                                <span class="text-lg">☀️</span>
+                                <span class="text-sm font-medium text-[#2d3436]" data-i18n="dhuhr">Dhuhr</span>
+                            </div>
+                            <span id="dhuhrWindow" class="text-xs text-[#636e72]">--:-- - --:--</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <input type="time" id="dhuhrStart" class="flex-1 px-2 py-1.5 text-sm bg-white border border-[#e8e6e1] rounded-lg text-[#2d3436] focus:outline-none focus:border-[#1e5f3d]/30">
+                            <span class="text-xs text-[#636e72]" data-i18n="to">to</span>
+                            <input type="time" id="dhuhrEnd" class="flex-1 px-2 py-1.5 text-sm bg-white border border-[#e8e6e1] rounded-lg text-[#2d3436] focus:outline-none focus:border-[#1e5f3d]/30">
+                        </div>
+                    </div>
+
+                    <!-- Asr -->
+                    <div class="prayer-setting p-3 bg-[#faf8f5] rounded-lg">
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="flex items-center gap-2">
+                                <span class="text-lg">🌤️</span>
+                                <span class="text-sm font-medium text-[#2d3436]" data-i18n="asr">Asr</span>
+                            </div>
+                            <span id="asrWindow" class="text-xs text-[#636e72]">--:-- - --:--</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <input type="time" id="asrStart" class="flex-1 px-2 py-1.5 text-sm bg-white border border-[#e8e6e1] rounded-lg text-[#2d3436] focus:outline-none focus:border-[#1e5f3d]/30">
+                            <span class="text-xs text-[#636e72]" data-i18n="to">to</span>
+                            <input type="time" id="asrEnd" class="flex-1 px-2 py-1.5 text-sm bg-white border border-[#e8e6e1] rounded-lg text-[#2d3436] focus:outline-none focus:border-[#1e5f3d]/30">
+                        </div>
+                    </div>
+
+                    <!-- Maghrib -->
+                    <div class="prayer-setting p-3 bg-[#faf8f5] rounded-lg">
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="flex items-center gap-2">
+                                <span class="text-lg">🌅</span>
+                                <span class="text-sm font-medium text-[#2d3436]" data-i18n="maghrib">Maghrib</span>
+                            </div>
+                            <span id="maghribWindow" class="text-xs text-[#636e72]">--:-- - --:--</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <input type="time" id="maghribStart" class="flex-1 px-2 py-1.5 text-sm bg-white border border-[#e8e6e1] rounded-lg text-[#2d3436] focus:outline-none focus:border-[#1e5f3d]/30">
+                            <span class="text-xs text-[#636e72]" data-i18n="to">to</span>
+                            <input type="time" id="maghribEnd" class="flex-1 px-2 py-1.5 text-sm bg-white border border-[#e8e6e1] rounded-lg text-[#2d3436] focus:outline-none focus:border-[#1e5f3d]/30">
+                        </div>
+                    </div>
+
+                    <!-- Isha -->
+                    <div class="prayer-setting p-3 bg-[#faf8f5] rounded-lg">
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="flex items-center gap-2">
+                                <span class="text-lg">🌙</span>
+                                <span class="text-sm font-medium text-[#2d3436]" data-i18n="isha">Isha</span>
+                            </div>
+                            <span id="ishaWindow" class="text-xs text-[#636e72]">--:-- - --:--</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <input type="time" id="ishaStart" class="flex-1 px-2 py-1.5 text-sm bg-white border border-[#e8e6e1] rounded-lg text-[#2d3436] focus:outline-none focus:border-[#1e5f3d]/30">
+                            <span class="text-xs text-[#636e72]">to</span>
+                            <input type="time" id="ishaEnd" class="flex-1 px-2 py-1.5 text-sm bg-white border border-[#e8e6e1] rounded-lg text-[#2d3436] focus:outline-none focus:border-[#1e5f3d]/30">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+                <p class="text-xs text-[#636e72] italic pt-2" data-i18n="notificationHint">Leave times empty to skip notification for that prayer.</p>
+
+            <p id="notificationError" class="hidden text-sm text-red-500 mt-2 p-2 bg-red-50 rounded-lg" data-i18n="notificationError">Please enter times within each prayer's window.</p>
+
+            <button onclick="saveNotificationSettings()" class="mt-4 w-full py-2.5 bg-[#1e5f3d] hover:bg-[#265f41] text-white rounded-lg text-sm font-medium transition-colors">
+                <span data-i18n="saveAllSettings">Save</span>
+            </button>
+        </div>
+    </div>
+
+            <!-- Settings Modal -->
+            <div id="settingsModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4">
+                <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="hideSettings()"></div>
+                <div class="relative bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 border border-[#e8e6e1] max-h-[90vh] overflow-y-auto">
+                    <button onclick="hideSettings()" class="absolute top-4 right-4 p-1 text-[#636e72] hover:text-[#2d3436] transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                    <h3 class="text-lg font-medium text-[#1e5f3d] mb-2" data-i18n="settingsTitle">Settings</h3>
+                    <p class="text-sm text-[#636e72] mb-6" data-i18n="settingsDesc">Customize your prayer calculation methods.</p>
+                    
+                    <div class="space-y-5">
+                        <!-- Calculation Method -->
+                        <div>
+                            <label class="block text-sm font-medium text-[#2d3436] mb-1.5" data-i18n="calcMethod">Calculation Method</label>
+                            <select id="calcMethod" class="w-full px-3 py-2 text-sm bg-[#faf8f5] border border-[#e8e6e1] rounded-lg text-[#2d3436] focus:outline-none focus:border-[#1e5f3d]/30">
+                                <option value="1">University of Islamic Sciences, Karachi</option>
+                                <option value="2">Islamic Society of North America (ISNA)</option>
+                                <option value="3">Muslim World League</option>
+                                <option value="4">Umm Al-Qura University, Makkah</option>
+                                <option value="5">Egyptian General Authority of Survey</option>
+                                <option value="7">Institute of Geophysics, University of Tehran</option>
+                                <option value="0">Shia ithna-anshari</option>
+                            </select>
+                        </div>
+        
+                        <!-- Asr Method -->
+                        <div>
+                            <label class="block text-sm font-medium text-[#2d3436] mb-1.5" data-i18n="asrMethod">Asr Method</label>
+                            <div class="flex gap-2">
+                                <label class="flex-1 cursor-pointer">
+                                    <input type="radio" name="asrMethod" value="0" class="peer sr-only">
+                                    <div class="text-center py-2 px-3 border border-[#e8e6e1] rounded-lg text-sm text-[#636e72] bg-[#faf8f5] peer-checked:bg-[#1e5f3d] peer-checked:text-white peer-checked:border-[#1e5f3d] transition-all">
+                                        <span data-i18n="standard">Others</span>
+                                    </div>
+                                </label>
+                                <label class="flex-1 cursor-pointer">
+                                    <input type="radio" name="asrMethod" value="1" class="peer sr-only">
+                                    <div class="text-center py-2 px-3 border border-[#e8e6e1] rounded-lg text-sm text-[#636e72] bg-[#faf8f5] peer-checked:bg-[#1e5f3d] peer-checked:text-white peer-checked:border-[#1e5f3d] transition-all">
+                                        <span data-i18n="hanafi">Hanafi</span>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+        
+                        <!-- Hijri Adjustment -->
+                        <div>
+                            <label class="block text-sm font-medium text-[#2d3436] mb-1.5" data-i18n="hijriAdj">Hijri Date Adjustment</label>
+                            <div class="flex items-center gap-3">
+                                <button id="hijriDec" class="w-10 h-10 flex items-center justify-center rounded-lg bg-[#faf8f5] border border-[#e8e6e1] hover:bg-[#e8e6e1] transition-colors">-</button>
+                                <input type="number" id="hijriAdj" value="0" readonly class="flex-1 text-center py-2 bg-transparent font-mono text-lg text-[#1e5f3d] border-none focus:ring-0">
+                                <button id="hijriInc" class="w-10 h-10 flex items-center justify-center rounded-lg bg-[#faf8f5] border border-[#e8e6e1] hover:bg-[#e8e6e1] transition-colors">+</button>
+                            </div>
+                            <p class="text-xs text-[#636e72] mt-1.5" data-i18n="hijriAdjHint">Adjust date by +/- days if needed.</p>
+                        </div>
+                    </div>
+        
+                    <button onclick="saveSettings()" class="mt-8 w-full py-2.5 bg-[#1e5f3d] hover:bg-[#265f41] text-white rounded-lg text-sm font-medium transition-colors">
+                        <span data-i18n="saveSettings">Save Settings</span>
+                    </button>
+                </div>
+            </div>
+
+    <!-- Fullscreen Prayer Notification Popup -->
+    <div id="prayerNotification" class="hidden fixed inset-0 z-[200] flex items-center justify-center p-4">
+        <div class="absolute inset-0 notification-bg"></div>
+        
+        <!-- Animated Background Pattern -->
+        <div class="absolute inset-0 overflow-hidden pointer-events-none">
+            <div class="notification-pattern"></div>
+        </div>
+
+        <!-- Small Close Button (top right corner) -->
+        <button id="dismissNotification" class="absolute top-6 right-6 p-2 text-white/30 hover:text-white/60 transition-colors z-10">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+        </button>
+
+        <div class="relative text-center max-w-lg w-full">
+            <!-- Main Content -->
+            <div class="notification-glow p-10 rounded-3xl">
+                <div class="w-28 h-28 mx-auto mb-8 rounded-full bg-white/10 flex items-center justify-center animate-pulse-slow">
+                    <span id="notificationIcon" class="text-6xl">🕌</span>
+                </div>
+                
+                <p class="text-white/50 text-sm uppercase tracking-[0.3em] mb-3">Time for Prayer</p>
+                <h1 id="notificationPrayerName" class="text-6xl sm:text-7xl font-medium text-white mb-6">Asr</h1>
+                
+                <!-- Countdown Timer -->
+                <div class="inline-block px-6 py-3 bg-white/10 rounded-full">
+                    <p class="text-white/50 text-xs uppercase tracking-wider mb-1">Time Remaining</p>
+                    <p id="notificationCountdown" class="text-2xl font-mono text-white">15:00</p>
+                </div>
+                
+                <p class="mt-8 text-white/30 text-xs">Focus on your prayer</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Monthly Calendar Modal -->
+    <div id="calendarModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="hideCalendar()"></div>
+        <div class="relative bg-white rounded-2xl shadow-2xl max-w-4xl w-full p-6 border border-[#e8e6e1] max-h-[90vh] overflow-y-auto">
+            <button onclick="hideCalendar()" class="absolute top-4 right-4 p-1 text-[#636e72] hover:text-[#2d3436] transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+            
+            <!-- Month Navigation -->
+            <div class="flex items-center justify-between mb-6">
+                <button id="prevMonth" class="p-2 rounded-lg hover:bg-[#1e5f3d]/5 text-[#636e72] hover:text-[#1e5f3d] transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                    </svg>
+                </button>
+                <h3 id="calendarTitle" class="text-xl font-medium text-[#1e5f3d]">February 2026</h3>
+                <button id="nextMonth" class="p-2 rounded-lg hover:bg-[#1e5f3d]/5 text-[#636e72] hover:text-[#1e5f3d] transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Day Headers -->
+            <div class="grid grid-cols-7 gap-1 mb-2">
+                <div class="text-center text-xs font-medium text-[#636e72] py-2">Sun</div>
+                <div class="text-center text-xs font-medium text-[#636e72] py-2">Mon</div>
+                <div class="text-center text-xs font-medium text-[#636e72] py-2">Tue</div>
+                <div class="text-center text-xs font-medium text-[#636e72] py-2">Wed</div>
+                <div class="text-center text-xs font-medium text-[#636e72] py-2">Thu</div>
+                <div class="text-center text-xs font-medium text-[#636e72] py-2">Fri</div>
+                <div class="text-center text-xs font-medium text-[#636e72] py-2">Sat</div>
+            </div>
+
+            <!-- Calendar Grid -->
+            <div id="calendarGrid" class="grid grid-cols-7 gap-1">
+                <!-- Days will be populated by JS -->
+            </div>
+
+            <!-- Loading State -->
+            <div id="calendarLoader" class="hidden py-12 text-center">
+                <div class="inline-block w-8 h-8 border-2 border-[#1e5f3d]/20 border-t-[#1e5f3d] rounded-full animate-spin"></div>
+                <p class="mt-3 text-sm text-[#636e72]">Loading prayer times...</p>
+            </div>
+
+            <!-- Download Button -->
+            <div class="mt-6 flex justify-center">
+                <button id="downloadCalendar" class="px-6 py-2.5 bg-[#1e5f3d] hover:bg-[#265f41] text-white text-sm rounded-lg transition-colors flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                    </svg>
+                    <span data-i18n="downloadCalendar">Download / Print</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Prayer Stats Modal -->
+    <div id="statsModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="hideStats()"></div>
+        <div class="relative bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 border border-[#e8e6e1] max-h-[90vh] overflow-y-auto">
+            <button onclick="hideStats()" class="absolute top-4 right-4 p-1 text-[#636e72] hover:text-[#2d3436] transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+            
+            <h3 class="text-lg font-medium text-[#1e5f3d] mb-2" data-i18n="prayerStats">📊 Prayer Statistics</h3>
+            <p class="text-sm text-[#636e72] mb-6" data-i18n="statsDesc">Track your daily prayers and build consistency.</p>
+
+            <!-- Streak Display -->
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <div class="p-4 bg-[#f0f7f4] rounded-xl text-center">
+                    <p class="text-3xl font-bold text-[#1e5f3d]" id="currentStreak">0</p>
+                    <p class="text-xs text-[#636e72] mt-1" data-i18n="currentStreak">Current Streak</p>
+                </div>
+                <div class="p-4 bg-[#faf8f5] rounded-xl text-center border border-[#e8e6e1]">
+                    <p class="text-3xl font-bold text-[#636e72]" id="bestStreak">0</p>
+                    <p class="text-xs text-[#636e72] mt-1" data-i18n="bestStreak">Best Streak</p>
+                </div>
+            </div>
+
+            <!-- Today's Progress -->
+            <div class="mb-6">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm font-medium text-[#2d3436]" data-i18n="todayProgress">Today's Progress</span>
+                    <span id="todayCount" class="text-sm text-[#1e5f3d] font-mono">0/5</span>
+                </div>
+                <div class="h-3 bg-[#f5f5f5] rounded-full overflow-hidden">
+                    <div id="todayProgressBar" class="h-full bg-gradient-to-r from-[#1e5f3d] to-[#4ade80] rounded-full transition-all duration-500" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <!-- Weekly Chart -->
+            <div class="mb-6">
+                <h4 class="text-sm font-medium text-[#2d3436] mb-3" data-i18n="last7Days">Last 7 Days</h4>
+                <div id="weeklyChart" class="flex items-end justify-between gap-2 h-24">
+                    <!-- Bars will be populated by JS -->
+                </div>
+                <div id="weeklyLabels" class="flex justify-between mt-2">
+                    <!-- Day labels will be populated by JS -->
+                </div>
+            </div>
+
+            <!-- Monthly Overview -->
+            <div class="p-4 bg-[#faf8f5] rounded-xl border border-[#e8e6e1]">
+                <div class="flex items-center justify-between">
+                    <span class="text-sm text-[#636e72]" data-i18n="thisMonth">This Month</span>
+                    <span id="monthlyCount" class="text-sm font-medium text-[#1e5f3d]">0 prayers</span>
+                </div>
+            </div>
+
+            <!-- Reset Button -->
+            <button id="resetStats" class="mt-6 w-full py-2 text-sm text-[#636e72] hover:text-red-500 transition-colors">
+                <span data-i18n="resetStats">Reset All Data</span>
+            </button>
+        </div>
+    </div>
+
+    <script src="dist/app.min.js"></script>
+</body>
+</html>

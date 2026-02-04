@@ -1,0 +1,804 @@
+/* Minimal Islamic Prayer Times - Enhanced Layout with Timeline */
+
+/* === CSS Variables === */
+:root {
+    --color-bg: #faf8f5;
+    --color-card: #ffffff;
+    --color-text: #2d3436;
+    --color-text-muted: #636e72;
+    --color-accent: #1e5f3d;
+    --color-border: #e8e6e1;
+}
+
+/* === Global Styles === */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-feature-settings: "liga", "kern";
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* === Fade-in Animations === */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-out;
+}
+
+.fade-in-delay-1 {
+    animation: fadeIn 0.5s ease-out 0.1s backwards;
+}
+
+.fade-in-delay-2 {
+    animation: fadeIn 0.5s ease-out 0.15s backwards;
+}
+
+.fade-in-delay-3 {
+    animation: fadeIn 0.5s ease-out 0.2s backwards;
+}
+
+.fade-in-delay-4 {
+    animation: fadeIn 0.5s ease-out 0.25s backwards;
+}
+
+.fade-in-delay-5 {
+    animation: fadeIn 0.5s ease-out 0.3s backwards;
+}
+
+/* === Timeline === */
+.timeline-item {
+    position: relative;
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: 3px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #f0f0f0;
+}
+
+.timeline-dot {
+    position: relative;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #e8e6e1;
+    flex-shrink: 0;
+    z-index: 1;
+    transition: all 0.3s ease;
+}
+
+/* === Prayer Row States === */
+.prayer-row {
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.prayer-row.current .timeline-dot {
+    width: 12px;
+    height: 12px;
+    left: -2px;
+    background: #1e5f3d;
+    box-shadow: 0 0 0 4px rgba(30, 95, 61, 0.15);
+}
+
+.prayer-row.current::before {
+    background: linear-gradient(180deg, #1e5f3d 0%, #f0f0f0 100%);
+}
+
+.prayer-row.current .prayer-start {
+    color: #1e5f3d;
+    font-weight: 600;
+}
+
+.prayer-row.current .prayer-status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 6px;
+    height: 6px;
+    background: #1e5f3d;
+    border-radius: 50%;
+    box-shadow: 0 0 0 2px rgba(30, 95, 61, 0.2);
+}
+
+.prayer-row.passed {
+    opacity: 0.5;
+}
+
+.prayer-row.passed .timeline-dot {
+    background: #1e5f3d;
+}
+
+.prayer-row.passed::before {
+    background: #1e5f3d;
+}
+
+.prayer-row.passed .prayer-status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: #1e5f3d;
+}
+
+.prayer-end {
+    font-size: 10px;
+    color: #b2bec3;
+    display: none; /* Hidden as per request */
+}
+
+.prayer-row.passed .prayer-status::before {
+    content: '✓';
+}
+
+/* Progress bar */
+.prayer-progress {
+    width: 0%;
+}
+
+.prayer-row.current .prayer-progress {
+    width: var(--progress, 0%);
+}
+
+.prayer-row.passed .prayer-progress {
+    width: 100%;
+}
+
+/* === Spinner === */
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.animate-spin {
+    animation: spin 1s linear infinite;
+}
+
+/* === Scrollbar === */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #e8e6e1;
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #1e5f3d;
+}
+
+/* === Selection === */
+::selection {
+    background: rgba(30, 95, 61, 0.15);
+    color: #1e5f3d;
+}
+
+/* === Focus States === */
+button:focus-visible,
+input:focus-visible {
+    outline: 2px solid rgba(30, 95, 61, 0.3);
+    outline-offset: 2px;
+}
+
+/* === Theme Toggle === */
+.sun-icon {
+    display: block;
+}
+
+.moon-icon {
+    display: none;
+}
+
+.dark .sun-icon {
+    display: none;
+}
+
+.dark .moon-icon {
+    display: block;
+}
+
+/* === Dark Mode === */
+body.dark {
+    background: #0f1419;
+    color: #e7e9ea;
+}
+
+body.dark header {
+    background: rgba(15, 20, 25, 0.95);
+    border-color: #2f3336;
+}
+
+.dark h1,
+.dark h2,
+.dark h3 {
+    color: #4ade80;
+}
+
+/* Current Prayer Card - Darker with Glow Effect */
+.dark #currentPrayerCard {
+    background: linear-gradient(135deg, #1a2e23 0%, #0f1f17 100%);
+    color: #e7e9ea;
+    border: 1px solid rgba(74, 222, 128, 0.2);
+    box-shadow: 0 0 40px rgba(74, 222, 128, 0.1);
+}
+
+.dark #currentPrayerCard h2 {
+    color: #4ade80 !important;
+}
+
+.dark #currentPrayerCard .text-white {
+    color: #e7e9ea;
+}
+
+.dark #currentPrayerCard .text-white\/60,
+.dark #currentPrayerCard .text-white\/70 {
+    color: rgba(231, 233, 234, 0.7);
+}
+
+.dark #currentPrayerCard .bg-white\/10 {
+    background: rgba(74, 222, 128, 0.1);
+    border: 1px solid rgba(74, 222, 128, 0.15);
+}
+
+.dark #currentPrayerCard p {
+    color: #e7e9ea;
+}
+
+/* Cards and Containers */
+.dark .bg-white {
+    background: #1a1f25;
+    border-color: #2f3336;
+}
+
+/* Text Colors */
+.dark .text-\[\#2d3436\] {
+    color: #e7e9ea;
+}
+
+.dark .text-\[\#636e72\] {
+    color: #8b98a5;
+}
+
+.dark .text-\[\#b2bec3\] {
+    color: #71767b;
+}
+
+.dark .text-\[\#1e5f3d\] {
+    color: #4ade80;
+}
+
+.dark .border-\[\#e8e6e1\] {
+    border-color: #2f3336;
+}
+
+.dark .bg-\[\#faf8f5\] {
+    background: #15191e;
+}
+
+/* Quran Section */
+.dark .bg-\[\#f0f7f4\] {
+    background: linear-gradient(135deg, #1a2e23 0%, #141c18 100%);
+    border-color: rgba(74, 222, 128, 0.25);
+}
+
+/* Prayer Row Icon Backgrounds */
+.dark .bg-\[\#fef8f0\],
+.dark .bg-\[\#fffbf0\],
+.dark .bg-\[\#fff5f0\],
+.dark .bg-\[\#fff0f3\],
+.dark .bg-\[\#f5f3ff\] {
+    background: rgba(74, 222, 128, 0.08);
+}
+
+/* Timeline */
+.dark .timeline-item::before {
+    background: #2f3336;
+}
+
+.dark .timeline-dot {
+    background: #2f3336;
+}
+
+.dark .prayer-row.current .timeline-dot {
+    background: #4ade80;
+    box-shadow: 0 0 0 4px rgba(74, 222, 128, 0.2);
+}
+
+.dark .prayer-row.current::before {
+    background: linear-gradient(180deg, #4ade80 0%, #2f3336 100%);
+}
+
+.dark .prayer-row.current .prayer-start {
+    color: #4ade80;
+    font-weight: 600;
+}
+
+.dark .prayer-row.current .prayer-status {
+    background: #4ade80;
+    box-shadow: 0 0 8px rgba(74, 222, 128, 0.4);
+}
+
+.dark .prayer-row.passed .timeline-dot {
+    background: #4ade80;
+}
+
+.dark .prayer-row.passed::before {
+    background: #4ade80;
+}
+
+.dark .prayer-row.passed .prayer-status {
+    color: #4ade80;
+}
+
+.dark .prayer-row.passed .prayer-status::before {
+    content: '✓';
+    font-weight: bold;
+}
+
+/* Progress Bar */
+.dark .prayer-progress {
+    background: #4ade80 !important;
+}
+
+.dark .bg-\[\#f5f5f5\] {
+    background: #1a1f25;
+}
+
+/* Form Inputs */
+.dark input {
+    background: #1a1f25;
+    border-color: #2f3336;
+    color: #e7e9ea;
+}
+
+.dark input::placeholder {
+    color: #71767b;
+}
+
+.dark input:focus {
+    border-color: #4ade80;
+    box-shadow: 0 0 0 2px rgba(74, 222, 128, 0.2);
+}
+
+/* Save Location Button */
+.dark #saveLocationBtn {
+    background: #4ade80;
+    color: #0f1419;
+    font-weight: 600;
+}
+
+.dark #saveLocationBtn:hover {
+    background: #22c55e;
+    box-shadow: 0 0 16px rgba(74, 222, 128, 0.3);
+}
+
+/* Cancel Button */
+.dark #cancelLocationBtn {
+    background: #2f3336;
+    color: #e7e9ea;
+}
+
+.dark #cancelLocationBtn:hover {
+    background: #3a3f44;
+}
+
+/* New Verse Button - Much More Visible */
+.dark #newAyahBtn {
+    background: linear-gradient(135deg, #1a2e23 0%, #0f1f17 100%);
+    border: 1px solid rgba(74, 222, 128, 0.4);
+    color: #4ade80;
+    font-weight: 500;
+}
+
+.dark #newAyahBtn:hover {
+    background: linear-gradient(135deg, #224a35 0%, #1a2e23 100%);
+    border-color: #4ade80;
+    box-shadow: 0 0 16px rgba(74, 222, 128, 0.2);
+}
+
+/* Change Location Button - Much More Visible */
+.dark #changeLocationBtn {
+    color: #8b98a5 !important;
+}
+
+.dark #changeLocationBtn:hover {
+    color: #4ade80 !important;
+}
+
+/* Header elements */
+.dark #headerLocation {
+    color: #8b98a5;
+}
+
+.dark #headerPrayerName {
+    color: #4ade80;
+}
+
+.dark #headerCountdown {
+    color: #e7e9ea;
+}
+
+/* Sehri/Iftar Cards */
+.dark #ramadanSection > div {
+    background: #1a1f25;
+    border-color: #2f3336;
+}
+
+.dark #sehriTime,
+.dark #iftarTime {
+    color: #4ade80 !important;
+}
+
+/* Scrollbar */
+.dark ::-webkit-scrollbar-track {
+    background: #1a1f25;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+    background: #2f3336;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+    background: #4ade80;
+}
+
+/* Selection */
+.dark ::selection {
+    background: rgba(74, 222, 128, 0.25);
+    color: #4ade80;
+}
+
+/* Islamic Pattern Background (dark mode) */
+.dark .bg-pattern-container {
+    opacity: 0.03;
+}
+
+.dark .bg-pattern-container svg pattern path,
+.dark .bg-pattern-container svg pattern circle {
+    stroke: #4ade80;
+}
+
+/* === Responsive === */
+@media (max-width: 640px) {
+    body {
+        font-size: 14px;
+    }
+
+    #currentPrayerCard {
+        padding: 1.25rem !important;
+    }
+
+    #currentPrayerCard h2 {
+        font-size: 2rem;
+    }
+}
+
+/* === Notification Popup === */
+.notification-bg {
+    background: linear-gradient(135deg, #050f0c 0%, #0a1f18 50%, #030a08 100%);
+}
+
+.notification-glow {
+    background: rgba(30, 95, 61, 0.2);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 
+        0 0 60px rgba(30, 95, 61, 0.3),
+        0 0 120px rgba(30, 95, 61, 0.2),
+        inset 0 0 60px rgba(30, 95, 61, 0.1);
+}
+
+.notification-pattern {
+    position: absolute;
+    inset: -50%;
+    background-image: 
+        radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.03) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.03) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(74, 222, 128, 0.05) 0%, transparent 30%);
+    animation: rotatePattern 60s linear infinite;
+}
+
+@keyframes rotatePattern {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes pulse-slow {
+    0%, 100% { 
+        opacity: 1; 
+        transform: scale(1);
+    }
+    50% { 
+        opacity: 0.8; 
+        transform: scale(1.05);
+    }
+}
+
+.animate-pulse-slow {
+    animation: pulse-slow 3s ease-in-out infinite;
+}
+
+/* Notification Settings Modal - Dark Mode */
+.dark #notificationSettings > div:last-child {
+    background: #1a1f25;
+    border-color: #2f3336;
+    color: #e7e9ea;
+}
+
+.dark #notificationSettings h3 {
+    color: #4ade80;
+}
+
+.dark #notificationSettings p,
+.dark #notificationSettings span,
+.dark #notificationSettings label {
+    color: #e7e9ea;
+}
+
+.dark #notificationSettings .bg-\[\#faf8f5\] {
+    background: #0f1419;
+}
+
+.dark #notificationSettings input[type="number"],
+.dark #notificationSettings input[type="time"] {
+    background: #1a1f25;
+    border-color: #2f3336;
+    color: #e7e9ea;
+    color-scheme: dark;
+}
+
+.dark #notificationSettings .peer-checked\:bg-\[\#1e5f3d\]:checked + div {
+    background: #4ade80;
+}
+
+/* Footer separator dark mode */
+.dark footer span {
+    color: #2f3336 !important;
+}
+
+/* === Performance === */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* === Prayer Tracking Checkbox === */
+.prayer-track-btn {
+    flex-shrink: 0;
+}
+
+.prayer-track-btn.completed {
+    background: #1e5f3d;
+    border-color: #1e5f3d;
+}
+
+.prayer-track-btn.completed svg {
+    opacity: 1;
+}
+
+.dark .prayer-track-btn {
+    border-color: #2f3336;
+}
+
+.dark .prayer-track-btn:hover {
+    border-color: #4ade80;
+}
+
+.dark .prayer-track-btn.completed {
+    background: #4ade80;
+    border-color: #4ade80;
+}
+
+.dark .prayer-track-btn.completed svg {
+    color: #0f1419;
+}
+
+/* === Calendar Modal === */
+#calendarModal > div:last-child {
+    max-width: 900px;
+}
+
+.calendar-day {
+    min-height: 80px;
+    padding: 0.5rem;
+    background: #faf8f5;
+    border-radius: 0.5rem;
+    border: 1px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.calendar-day:hover {
+    border-color: #1e5f3d;
+    background: #f0f7f4;
+}
+
+.calendar-day.today {
+    background: #f0f7f4;
+    border-color: #1e5f3d;
+    box-shadow: 0 0 0 2px rgba(30, 95, 61, 0.1);
+}
+
+.calendar-day.empty {
+    background: transparent;
+    border: none;
+}
+
+.calendar-day .day-number {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #1e5f3d;
+    margin-bottom: 0.25rem;
+}
+
+.calendar-day .prayer-times {
+    font-size: 0.6rem;
+    color: #636e72;
+    line-height: 1.4;
+}
+
+.calendar-day .prayer-times span {
+    display: block;
+}
+
+.dark .calendar-day {
+    background: #1a1f25;
+}
+
+.dark .calendar-day:hover {
+    background: #1a2e23;
+    border-color: #4ade80;
+}
+
+.dark .calendar-day.today {
+    background: #1a2e23;
+    border-color: #4ade80;
+    box-shadow: 0 0 0 2px rgba(74, 222, 128, 0.15);
+}
+
+.dark .calendar-day .day-number {
+    color: #4ade80;
+}
+
+.dark .calendar-day .prayer-times {
+    color: #8b98a5;
+}
+
+/* === Stats Modal === */
+.dark #statsModal > div:last-child {
+    background: #1a1f25;
+    border-color: #2f3336;
+}
+
+.dark #statsModal h3 {
+    color: #4ade80;
+}
+
+.dark #statsModal .bg-\[#f0f7f4\] {
+    background: #1a2e23;
+}
+
+.dark #statsModal #currentStreak {
+    color: #4ade80;
+}
+
+.dark #statsModal #bestStreak {
+    color: #e7e9ea;
+}
+
+.dark #statsModal .bg-\[#faf8f5\] {
+    background: #15191e;
+}
+
+.dark #statsModal .bg-\[#f5f5f5\] {
+    background: #0f1419;
+}
+
+/* Weekly Chart Bars */
+.stats-bar {
+    width: 100%;
+    border-radius: 4px 4px 0 0;
+    background: linear-gradient(to top, #1e5f3d, #4ade80);
+    transition: height 0.3s ease;
+}
+
+.stats-bar.empty {
+    background: #e8e6e1;
+}
+
+.dark .stats-bar.empty {
+    background: #2f3336;
+}
+
+.stats-label {
+    text-align: center;
+    font-size: 0.65rem;
+    color: #636e72;
+}
+
+.dark .stats-label {
+    color: #8b98a5;
+}
+
+/* Calendar Modal Dark Mode */
+.dark #calendarModal > div:last-child {
+    background: #1a1f25;
+    border-color: #2f3336;
+}
+
+.dark #calendarModal h3,
+.dark #calendarTitle {
+    color: #4ade80;
+}
+
+.dark #calendarModal .grid > div {
+    color: #8b98a5;
+}
+
+/* Print Styles */
+@media print {
+    body * {
+        visibility: hidden;
+    }
+    
+    #calendarModal,
+    #calendarModal * {
+        visibility: visible;
+    }
+    
+    #calendarModal {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        background: white !important;
+    }
+    
+    #calendarModal > div:first-child {
+        display: none;
+    }
+    
+    #calendarModal > div:last-child {
+        max-width: 100%;
+        max-height: none;
+        overflow: visible;
+        box-shadow: none;
+        border: none;
+    }
+    
+    #downloadCalendar {
+        display: none;
+    }
+    
+    .calendar-day {
+        border: 1px solid #e8e6e1 !important;
+    }
+}
+

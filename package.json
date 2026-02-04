@@ -1,0 +1,21 @@
+{
+  "name": "prayer-time",
+  "version": "1.0.0",
+  "main": "app.js",
+  "scripts": {
+    "build:tailwind": "tailwindcss -i ./src/input.css -o ./dist/tailwind.tmp.css --minify",
+    "build:css": "npm run build:tailwind && cat dist/tailwind.tmp.css style.css > dist/styles.css && rm dist/tailwind.tmp.css",
+    "build:js": "terser app.js -o dist/app.min.js --compress --mangle",
+    "watch:css": "tailwindcss -i ./src/input.css -o ./dist/tailwind.css --watch",
+    "build": "npm run build:css && npm run build:js",
+    "dev": "npm run watch:css"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "tailwindcss": "3.4",
+    "terser": "^5.46.0"
+  }
+}
